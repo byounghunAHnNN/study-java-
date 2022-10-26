@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.admsst.dao.CounselDao">
+
+    <select id="listCounsel" resultType="kr.happyjob.study.admsst.model.CounselModel">
+				select  li_nm 
+				       ,concat(DATE_FORMAT(li_date, '%Y-%m-%d'),' ~ ',DATE_FORMAT(li_redate, '%Y-%m-%d')) as li_date 
+				       ,li_no
+				from tb_lecinfo  
+
+			   limit #{startnum},#{pagesize}
+				      
+    </select>
+    
+  <select id="searchlistcnt" resultType="int">
+  
+            select count(*)
+            from tb_lecinfo
+            
+  </select>
+  	<select id="listCounselDtl" resultType="kr.happyjob.study.admsst.model.CounselDtlModel">
+
+		 select ts.loginID
+      		   ,ui.name as ui_name
+      		   ,ifnull(ll.ss_score,0) as ss_score
+  		from tb_subjectlist ts
+       		inner join (select loginID, name from tb_userinfo where user_type='C') ui on ts.loginID = ui.loginID       
+       		left outer join (  
+                          select li_no
+                                ,loginID
+                                ,test_cd
+                                ,sum(ss_score) as ss_score
+                            from tb_stdanswer
+                          group by li_no
+                                  ,loginID
+                                  ,test_cd
+                       ) ll on ts.li_no = ll.li_no and ts.loginID = ll.loginID and test_cd = ( select test_cd from tb_lecinfo where li_no =#{li_no})
+ 		 where ts.li_no =#{li_no}
+ 		 LIMIT #{startnum},#{pagesize};
+
+	</select>
+
+	<select id="listCounselDtlCnt" resultType="int">
+
+		 select count(ts.loginID)
+  		from tb_subjectlist ts
+       		inner join (select loginID, name from tb_userinfo where user_type='C') ui on ts.loginID = ui.loginID       
+       		left outer join (  
+                          select li_no
+                                ,loginID
+                                ,test_cd
+                                ,sum(ss_score) as ss_score
+                            from tb_stdanswer
+                          group by li_no
+                                  ,loginID
+                                  ,test_cd
+                       ) ll on ts.li_no = ll.li_no and ts.loginID = ll.loginID and test_cd = ( select test_cd from tb_lecinfo where li_no =#{li_no})
+ 		 where ts.li_no =#{li_no}
+ 		 LIMIT #{startnum},#{pagesize};
+
+	</select>
+	
+  	<select id="listCounselDtl2" resultType="kr.happyjob.study.admsst.model.CounselDtlModel2">
+  	
+  	 	    select  loginID
+  	 	   		   ,DATE_FORMAT(cs_date, '%Y-%m-%d') as cs_date
+    		       ,cs_place
+    		       ,cs_nm
+
+   	  			from tb_consult  
+
+   			 where loginID = #{loginID}
+   	 
+   	 	
+  	</select>
+  	
+  	<select id="listCounselDtlCnt2" resultType="int">
+  	 
+  	  select count(*)
+
+   		from tb_consult 
+
+   	   where loginID = #{loginID}	
+   	  
+	</select>
+	
+	<insert id="insertConsult">
+
+          insert into tb_consult         <!-- 테이블명 내가 쓰는.  -->
+                        (
+	                        li_no
+	               		   ,loginID
+		    		       ,cs_date
+		    		       ,cs_place
+		    		       ,cs_nm
+		    		       ,cs_ct
+                        ) values (
+                            #{li_no} 
+                           ,#{loginID}
+                           ,now()
+                           ,#{cs_place}
+                           ,#{cs_nm}
+                           ,#{cs_ct}
+
+                        )
+    </insert>
+  	  	
+
+
+    
+</mapper>

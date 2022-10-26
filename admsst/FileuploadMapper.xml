@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.admsst.dao.FileuploadDao">
+
+    <select id="listFileupload" resultType="kr.happyjob.study.admsst.model.FileuploadModel">
+            select tb.bd_no
+                 , tb.bd_title
+                 , tb.loginID
+                 , ui.name
+                 , tb.bd_contents
+                 , tb.bd_date
+                 , tb.bd_type
+                 , tb.att_no
+          from tb_board tb
+                 inner join tb_userinfo ui on ui.loginID = tb.loginID          
+         <where>
+			<if test="(searchvalue != null) and (!searchvalue.equals(''))">
+				<choose>
+					<when
+						test="searchtype eq 'seq'.toString()">
+						and tb.bd_no = #{searchvalue}
+					</when>
+					<when
+						test="searchtype eq 'title'.toString()">
+						and tb.bd_title LIKE CONCAT('%', #{searchvalue}, '%')
+					</when>
+					<when
+						test="searchtype eq 'writer'.toString()">
+						and ui.name LIKE CONCAT('%', #{searchvalue}, '%')
+					</when>
+					<otherwise>
+						AND (
+						              tb.bd_no = #{searchvalue}
+						          or tb.bd_title LIKE CONCAT('%', #{searchvalue}, '%')
+						          or and ui.name LIKE CONCAT('%', #{searchvalue}, '%')
+						        )
+						
+					</otherwise>
+				</choose>
+			</if>
+		</where> 
+		limit #{startnum},#{pagesize}
+    </select>
+    
+    <select id="searchlistcnt" resultType="int">
+            select count(*)
+            from tb_board tb
+                   inner join tb_userinfo ui on ui.loginID = tb.loginID          
+         <where>
+			<if test="(searchvalue != null) and (!searchvalue.equals(''))">
+				<choose>
+					<when
+						test="searchtype eq 'seq'.toString()">
+						and tb.bd_no = #{searchvalue}
+					</when>
+					<when
+						test="searchtype eq 'title'.toString()">
+						and tb.bd_title LIKE CONCAT('%', #{searchvalue}, '%')
+					</when>
+					<when
+						test="searchtype eq 'writer'.toString()">
+						and ui.name LIKE CONCAT('%', #{searchvalue}, '%')
+					</when>
+					<otherwise>
+						AND (
+						              tb.bd_no = #{searchvalue}
+						          or tb.bd_title LIKE CONCAT('%', #{searchvalue}, '%')
+						          or and ui.name LIKE CONCAT('%', #{searchvalue}, '%')
+						        )
+						
+					</otherwise>
+				</choose>
+			</if>
+		</where> 
+    </select>
+         
+         
+         <!-- 검색   -->
+   <select id="selectFileupload" resultType="kr.happyjob.study.admsst.model.FileuploadModel">
+            select tb.bd_no
+                 , tb.bd_title
+                 , tb.loginID
+                 , ui.name
+                 , tb.bd_contents
+                 , tb.bd_date
+                 , tb.bd_type
+                 , tb.att_no
+                 , at.att_ori
+                 , at.att_nli
+                 , at.att_mul
+                 , at.att_size
+          from tb_board tb
+                 inner join tb_userinfo ui on ui.loginID = tb.loginID  
+                 left outer join tb_attachment at on at.att_no = tb.att_no
+         where tb.bd_no = #{bd_no}      
+    </select>
+    
+
+    <insert id="insertFileupload">
+         <selectKey resultType="int" keyProperty="nbd_no" order="BEFORE">
+            select ifnull(max(bd_no),0) + 1 from tb_board 
+        </selectKey> 
+          insert into tb_board          <!-- 테이블명 내가 쓰는.  -->
+                        (
+                           bd_no          
+                         , bd_title   
+                         , loginID   
+                         , bd_contents
+                         , bd_date  
+                         , bd_type 
+                         , att_no  
+                        ) values (
+                           #{nbd_no} 
+                         <if test="filepro eq 'N'.toString()">
+                         ,#{title} 
+                         </if>
+                         <if test="filepro eq 'Y'.toString()">
+                         ,#{titlefile} 
+                         </if>
+                         ,#{loginID} 
+                         <if test="filepro eq 'N'.toString()">
+                         ,#{cont} 
+                         </if>
+                         <if test="filepro eq 'Y'.toString()">
+                         ,#{contfile} 
+                         </if>
+                         ,now()
+                         ,'1'
+                         <if test="fileyn eq 'N'.toString()">
+                         ,0
+                         </if>
+                         <if test="fileyn eq 'Y'.toString()">
+                         ,(select ifnull(max(att_no),0) from tb_attachment )
+                         </if>
+                        )
+    </insert>
+    
+    <update id="updateFileupload">
+          update tb_board                     
+               set bd_date  = now()           
+                  , loginID = #{loginID}   
+                  <if test="filepro eq 'N'.toString()">
+                  , bd_contents = #{cont} 
+                  </if>
+                  <if test="filepro eq 'Y'.toString()">
+                  , bd_contents = #{contfile} 
+                  </if>
+                  <if test="filepro eq 'N'.toString()">
+                  , bd_title  =  #{title} 
+                  </if>
+                  <if test="filepro eq 'Y'.toString()">
+                  , bd_title  =  #{titlefile} 
+                  </if>
+                  <if test="fileyn eq 'N'.toString()">
+                  , att_no  = 0
+                  </if>
+                  <if test="fileyn eq 'Y'.toString()">
+                  , att_no  = (select ifnull(max(att_no),0) from tb_attachment )
+                  </if>
+          where bd_no = #{bd_no} 
+    </update>
+    
+     <delete id="deleteFileupload">
+          delete from tb_board
+          where bd_no = #{bd_no} 
+    </delete>   
+    
+    <insert id="insertFileinfo">
+         <selectKey resultType="int" keyProperty="att_no" order="BEFORE">
+            select ifnull(max(att_no),0) + 1 from tb_attachment 
+        </selectKey> 
+          insert into tb_attachment
+                        (
+                           att_no          
+                         , att_ori   
+                         , att_date   
+                         , att_nli
+                         , att_mul  
+                         , att_size
+                        ) values (
+                           #{att_no} 
+                         ,#{file_nm} 
+                         ,now()
+                         ,#{loc_file_loc} 
+                         ,#{file_loc} 
+                         ,#{file_size} 
+                        )
+    </insert>
+    
+    <delete id="deleteFileinfobybdno">
+          delete from tb_attachment
+           where att_no = (
+                                       select att_no 
+                                        from tb_board
+                                       where bd_no = #{bd_no}            
+                                 )
+    </delete>
+    
+
+    
+</mapper>

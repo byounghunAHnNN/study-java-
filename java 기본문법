@@ -1,0 +1,38 @@
+변수는 말 그대로 처음에 초기화를 해놓고 값 갱신 가능
+int x = 30;
+System.out.println(35);
+System.out.println(36+20);
+System.out.println(x +35);
+
+x =40;
+System.out.println(x);
+
+--변수형 타입--
+long l =30L;
+short s = 30;
+byte b =30;
+
+double dd =30.0;
+float ff =30.0f;
+System.out.println(x);
+
+char c ='c';
+char cc ='한';
+
+String str ='여러 글자';
+int i = (int) 30L; => 형변환 
+
+자바에서 제공하는 유용한 클래스
+Math.max(13,30); => 어떤 값이 더 큰지 나옴. 
+
+String str ="100";
+int i = Integer.parseInt(str); => String -> int 변환
+String str2 = String.valueOf(i); => Int -> String 변환
+
+Random random = new Random();
+random.nextInt( bound 10); => 0~9까지의 임의의 값을 나타냄. // 0 - 9 (바운드값 전까지) 5~9 까지 하려면 바운드를 4로 두면 0~4가 나오는데 그 값에 =5를 하면 5~9까지가 나타남.
+
+scanner 
+
+
+

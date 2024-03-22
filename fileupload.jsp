@@ -167,7 +167,7 @@
 		//callAjax("/admsst/saveFileupload.do", "post", "json", true, param, savecallback);
 		callAjax("/admsst/saveFileupload.do", "post", "json", true,  $("#myForm").serialize(), savecallback);
 	}
-	
+	// 해피잡 기업연수원 테스트 
 </script>
 
 </head>

@@ -1,11 +1,16 @@
 package ref;
 
 public class Student {
-    String name;
-    int age;
-    int grade;
+	
+	String name;
+	int age;
+	int grade;
 
 
+	public static void main(String[] args) {
+		
+
+	}
 
 
 }

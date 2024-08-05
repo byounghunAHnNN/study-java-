@@ -1,19 +1,32 @@
-package oop1.ex;
+package object.lang.test;
 
 public class Rectangle {
-	int width =5;
-	int height =8;
+
+	private int width;
+	private int height;
 	
-	
-	int calculateArea() {
-		return width * height;
+	public Rectangle ( int width, int height) {
+		
+		 this.width = width;
+		 this.height = height;
+		 
 	}
 	
-	int perimeter() {
-		return 2 * (width + height);
+
+	
+	@Override
+	public boolean equals(Object o) {
+		 if (this == o) return true;
+		 if (o == null || getClass() != o.getClass()) return false;
+		 Rectangle rectangle = (Rectangle) o;
+		 return width == rectangle.width && height == rectangle.height;
 	}
 	
-	boolean isSquare() {
-		return width != height;
+	@Override 
+	public String toString() { 
+		 return "Rectangle{" +
+				 "width=" + width +
+				 ", height=" + height +
+				 '}';
 	}
 }
